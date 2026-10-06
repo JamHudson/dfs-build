@@ -2,6 +2,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 
 public class Build {
@@ -84,6 +85,19 @@ public class Build {
    * @return true if the destination is reachable from the start, false otherwise
    */
   public static boolean canReach(Airport start, Airport destination) {
+    if (start.getAirportCode() == destination.getAirportCode()) return true;
+    return canReach(start,destination, new HashSet<>());
+  }
+
+  private static boolean canReach(Airport current, Airport destination, Set<Airport> visited) {
+    if (current == null || visited.contains(current)) return false;
+    visited.add(current);
+
+    for (var airport : current.getOutboundFlights()) {
+      if (airport.getAirportCode() == destination.getAirportCode()) return true;
+      if (canReach(airport, destination, visited)) return true;
+    }
+
     return false;
   }
 
@@ -97,6 +111,23 @@ public class Build {
    * @return a set of values that cannot be reached from the starting value
    */
   public static <T> Set<T> unreachable(Map<T, List<T>> graph, T starting) {
-    return new HashSet<>();
+    Set<T> visited = new HashSet<>();
+    if (graph == null) return visited;
+      Stack<T> stack = new Stack<>();
+    stack.add(starting);
+
+    while (!stack.isEmpty()) {
+      T vertex = stack.pop();
+      visited.add(vertex);
+
+      for (var neighbor : graph.get(vertex)) {
+        if (!visited.contains(neighbor)) stack.add(neighbor);
+      }
+    }
+  
+    // Not ideal, should instead be a copy of keySet, but not necessary either
+    graph.keySet().removeAll(visited);
+
+    return graph.keySet();
   }
 }
