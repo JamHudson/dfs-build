@@ -1,3 +1,5 @@
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,14 +115,14 @@ public class Build {
   public static <T> Set<T> unreachable(Map<T, List<T>> graph, T starting) {
     Set<T> visited = new HashSet<>();
     if (graph == null) return visited;
-      Stack<T> stack = new Stack<>();
+    Stack<T> stack = new Stack<>();
     stack.add(starting);
 
     while (!stack.isEmpty()) {
       T vertex = stack.pop();
       visited.add(vertex);
 
-      for (var neighbor : graph.get(vertex)) {
+      for (var neighbor : graph.getOrDefault(vertex,new ArrayList<T>())) {
         if (!visited.contains(neighbor)) stack.add(neighbor);
       }
     }
